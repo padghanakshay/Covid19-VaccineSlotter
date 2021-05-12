@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,21 +20,35 @@ namespace VaccineSlotter
         {
             SessonData data = new SessonData();
 
+            {
+                string toRemove = "\"sessions\":";
+                int startIndex = centerDataString.IndexOf(toRemove);
+                if (startIndex >= 0)
+                {
+                    centerDataString = centerDataString.Remove(startIndex, toRemove.Length);
+                    centerDataString = centerDataString.Remove(0, 2);
+                    centerDataString = centerDataString.Remove(centerDataString.Length - 2, 2);
+
+                }
+            }
+
             String value = "\"session_id\":";
             data.Session_id = parseData(ref centerDataString, ref value, true);
 
             value = "\"date\":";
             data.Date = parseData(ref centerDataString, ref value, true);
             //DateTime dateTime = DateTime.Parse(dateString);
-           // data.Date = dateTime;
+            // data.Date = dateTime;
 
             value = "\"available_capacity\":";
             string availableCapacity = parseData(ref centerDataString, ref value, false);
-            data.Available_Capacity = int.Parse(availableCapacity);
+            double capacity = double.Parse(availableCapacity);
+            data.Available_Capacity = Convert.ToInt32(capacity);
 
             value = "\"min_age_limit\":";
             string ageLimitMin = parseData(ref centerDataString, ref value, false);
-            data.Min_age_limit = int.Parse(ageLimitMin);
+            double age = double.Parse(ageLimitMin);
+            data.Min_age_limit = Convert.ToInt32(age);
 
             value = "\"vaccine\":";
             data.Vaccine = parseData(ref centerDataString, ref value, true);
@@ -113,7 +127,10 @@ namespace VaccineSlotter
 
             value = "\"fee_type\":";
             string fees = parseData(ref centerDataString, ref value, true);
-            data.IsFree = fees == "Free";
+            if (fees == "Free")
+                data.IsFree = true;
+            else
+                data.IsFree = false;
 
             data.SessonsData = parseSessionData(ref centerDataString);           
             return data;
