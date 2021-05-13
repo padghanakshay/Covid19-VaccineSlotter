@@ -16,7 +16,30 @@ namespace VaccineSlotter
 
         //==================================================================================
 
-        static private SessonData parseSessionData(ref string centerDataString)
+        static private List<SessonData> parseSessionData(ref string centerDataString)
+        {
+            List<SessonData> data = new List<SessonData>();
+
+            string startString = "\"sessions\":";
+            int tempIndex = centerDataString.IndexOf(startString);
+            while (tempIndex >= 0)
+            {
+                SessonData pSessonData = parseSessionDataObj(ref centerDataString);
+                if (pSessonData == null)
+                    break;
+                data.Add(pSessonData);
+                tempIndex = centerDataString.IndexOf(startString);
+            }
+
+            if (data.Count == 0)
+                data = null;
+            return data;
+        }
+
+
+        //==================================================================================
+
+        static private SessonData parseSessionDataObj(ref string centerDataString)
         {
             SessonData data = new SessonData();
 
@@ -66,6 +89,14 @@ namespace VaccineSlotter
             int keyStartIndex = key.IndexOf(value);
             if (keyStartIndex < 0)
                 return null;
+
+            // Here keyStartIndex must be zero
+            //if not zero but key is present then remove the extra string before key
+            if (keyStartIndex > 0)
+            {
+                key = key.Remove(0, keyStartIndex );
+                keyStartIndex = key.IndexOf(value);
+            }
 
             key = key.Remove(keyStartIndex, value.Length);
 
@@ -132,7 +163,7 @@ namespace VaccineSlotter
             else
                 data.IsFree = false;
 
-            data.SessonsData = parseSessionData(ref centerDataString);           
+            data.SessonsDataArray = parseSessionData(ref centerDataString);           
             return data;
         }
 
@@ -160,8 +191,7 @@ namespace VaccineSlotter
                     centerEndIndexIndex = response.IndexOf("}");
                     commaAtLast = 0;
                 }
-
-                // Get substring of center data
+                
                 int lengthOfSubString_ = centerEndIndexIndex - centerStartIndex + 1;
                 string centerDataString = response.Substring(centerStartIndex, lengthOfSubString_);
                 centerDataStringArray.Add(centerDataString);
