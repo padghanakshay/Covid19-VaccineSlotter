@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,11 +23,11 @@ namespace VaccineSlotter
         private string m_From_;
         private string m_To_;
         private bool m_IsFree;
-        private SessonData m_SessonsData = new SessonData();
+        private List<SessonData> m_SessonsData = new List<SessonData>();
 
         //==================================================
 
-        public SessonData SessonsData
+        public List<SessonData> SessonsDataArray
         {
             get { return m_SessonsData; }   // get method
             set { m_SessonsData = value; }  // set method
