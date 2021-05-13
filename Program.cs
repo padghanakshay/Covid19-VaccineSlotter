@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -153,16 +153,21 @@ namespace VaccineSlotter
             result += "PinCode \t" + data.PinCode +"\n";
             Console.WriteLine("PinCode \t" + data.PinCode);
 
-            SessonData pSessionData = data.SessonsData;
-            int minAgeInData = pSessionData.Min_age_limit;
-            int slotAvailable = pSessionData.Available_Capacity;
+            List<SessonData> pSessionData = data.SessonsDataArray;
 
-            result += "Min Age Limit \t" + minAgeInData.ToString() +"\n";
-            Console.WriteLine("Min Age Limit \t" + minAgeInData.ToString());
+            for (int sCount = 0; pSessionData != null && sCount < pSessionData.Count; ++sCount)
+            {
+                SessonData pObj = pSessionData[sCount];
+                int minAgeInData = pObj.Min_age_limit;
+                int slotAvailable = pObj.Available_Capacity;
 
-            result += "Slot Available \t" + slotAvailable.ToString() + "\n";
-            Console.WriteLine("Slot Available \t" + slotAvailable.ToString());
+                result += "Min Age Limit \t" + minAgeInData.ToString() + "\n";
+                Console.WriteLine("Min Age Limit \t" + minAgeInData.ToString());
 
+                result += "Slot Available \t" + slotAvailable.ToString() + "\n";
+                Console.WriteLine("Slot Available \t" + slotAvailable.ToString());
+
+            }
             result += "===========================================" + "\n";
             Console.WriteLine("===========================================\n");
 
@@ -195,15 +200,20 @@ namespace VaccineSlotter
                 for (int count = 0; count < centerData.Count; ++count )
                 {
                     CenterData pData = centerData[count];
-                    SessonData pSessionData = pData.SessonsData;
-                    int minAgeInData = pSessionData.Min_age_limit;
-                    int slotAvailable = pSessionData.Available_Capacity;
+                    List<SessonData> pSessionData = pData.SessonsDataArray;
 
-                    if (minAgeInData == minAge)
+                    for (int sCount = 0; pSessionData != null && sCount < pSessionData.Count; ++sCount)
                     {
-                        if (slotAvailable > 0)
+                        SessonData pSessonDataInArray = pSessionData[sCount];
+                        int minAgeInData = pSessonDataInArray.Min_age_limit;
+                        int slotAvailable = pSessonDataInArray.Available_Capacity;
+
+                        if (minAgeInData == minAge)
                         {
-                            shortedData.Add(pData);
+                            if (slotAvailable > 0)
+                            {
+                                shortedData.Add(pData);
+                            }
                         }
                     }
                 }// Data 
@@ -246,7 +256,7 @@ namespace VaccineSlotter
                 smtp.Host = "smtp.gmail.com"; //for gmail host  
                 smtp.EnableSsl = true;
                 smtp.UseDefaultCredentials = false;
-                smtp.Credentials = new NetworkCredential("akshaypadghan567@gmail.com", "PASSWORD");
+                smtp.Credentials = new NetworkCredential("akshaypadghan567@gmail.com", "A8379820735@a");
                 smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
                 smtp.Send(message);
             }
