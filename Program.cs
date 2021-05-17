@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -142,16 +142,16 @@ namespace VaccineSlotter
 
         static string  DisplayCenterData(ref CenterData data)
         {
-            string result = "";
+            string result = "\n";
 
-            result += "===========================================\n";
-            Console.WriteLine("===========================================");
+            result += "------------------------------------------------------\n";
+            Console.WriteLine("==============================================\n");
 
-            result += "Name \t" + data.Name + "\n";
-            Console.WriteLine("Name \t" + data.Name);
+            result += "\nName: \t" + data.Name;
+            Console.WriteLine("\nName: \t" + data.Name);
 
-            result += "PinCode \t" + data.PinCode +"\n";
-            Console.WriteLine("PinCode \t" + data.PinCode);
+            result += "\nPinCode: \t" + data.PinCode +"\n";
+            Console.WriteLine("\nPinCode \t" + data.PinCode);
 
             List<SessonData> pSessionData = data.SessonsDataArray;
 
@@ -161,11 +161,11 @@ namespace VaccineSlotter
                 int minAgeInData = pObj.Min_age_limit;
                 int slotAvailable = pObj.Available_Capacity;
 
-                result += "Min Age Limit \t" + minAgeInData.ToString() + "\n";
-                Console.WriteLine("Min Age Limit \t" + minAgeInData.ToString());
+                result += "\nMin Age Limit \t" + minAgeInData.ToString() + "\n";
+                Console.WriteLine("\nMin Age Limit: \t" + minAgeInData.ToString());
 
                 result += "Slot Available \t" + slotAvailable.ToString() + "\n";
-                Console.WriteLine("Slot Available \t" + slotAvailable.ToString());
+                Console.WriteLine("\nSlot Available: \t" + slotAvailable.ToString());
 
             }
             result += "===========================================" + "\n";
@@ -176,7 +176,7 @@ namespace VaccineSlotter
 
         //=======================================================================
 
-        static void ReadDataByDistrictName(int minAge, int distCode, ref string emailId)
+        static HttpStatusCode ReadDataByDistrictName(int minAge, int distCode, ref string emailId)
         {
             DateTime date = DateTime.Now;
             // converting to string format
@@ -184,7 +184,12 @@ namespace VaccineSlotter
 
             string URL = "https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByDistrict?district_id=" + distCode.ToString() + 
                 "&date=" + date_str;
+
             HttpWebResponse response = Program.GET(URL);
+
+            if (response == null)
+                return HttpStatusCode.BadRequest;
+
             HttpStatusCode statusCode = response.StatusCode;
             if (statusCode == HttpStatusCode.OK)
             {
@@ -236,6 +241,9 @@ namespace VaccineSlotter
                 }// checker
 
             }
+
+
+            return statusCode;
         }
 
 
@@ -270,18 +278,33 @@ namespace VaccineSlotter
 
         static void Main(string[] args)
         {
-            Console.WriteLine("Welcome!! I can alert you when slot is available.");
+            Console.WriteLine("     Welcome!! \n    I can alert you when slot is available. \n\n");
 
             Console.WriteLine("Enter min age to set an alert");
-            int age = Convert.ToInt32(Console.ReadLine());
+            string ageString = Console.ReadLine();
+            if (ageString == null || ageString.Length == 0)
+            {
+                Console.WriteLine("!!!      Invalid Input Age. Run Software Again   !!!!\n");
+                Console.ReadLine();
+                return;
+            }
+
+            int age = Convert.ToInt32(ageString);
 
             Console.WriteLine("Give me your email ID to alert");
             string emailID = Console.ReadLine();
 
-            Console.WriteLine("Give me your District code, ex 367 for Buldhana, 376 for Satara");
-            int distCode = Convert.ToInt32(Console.ReadLine());
+            Console.WriteLine("\nGive me your District code, ex 367 for Buldhana, 376 for Satara");
+            string distCodeString = Console.ReadLine();
+            if (distCodeString == null || distCodeString.Length == 0)
+            {
+                Console.WriteLine("!!!      Invalid Input District Code. Run Software Again   !!!!\n");
+                Console.ReadLine();
+                return;
+            }
+            int distCode = Convert.ToInt32(distCodeString);
 
-            Console.WriteLine("Vaccine-Spotter is Running");
+            Console.WriteLine("\n------------------Vaccine-Spotter is Running--------------------------\n");
 
             DateTime startTime = DateTime.Now;
             DateTime endTime = DateTime.Now;
@@ -289,7 +312,7 @@ namespace VaccineSlotter
             int sec = 3;
 
             DateTime messageTime = DateTime.Now;
-
+            HttpStatusCode statusCode = HttpStatusCode.NotImplemented;
             while(true)
             {                
                 if (sec >= 3) // 3 Sec
@@ -297,7 +320,9 @@ namespace VaccineSlotter
                     startTime = DateTime.Now;
                     endTime = DateTime.Now;
 
-                    ReadDataByDistrictName(age, distCode, ref emailID);
+                    statusCode = ReadDataByDistrictName(age, distCode, ref emailID);
+                    if (statusCode != HttpStatusCode.OK)
+                        break;
                 }                
 
                 endTime = DateTime.Now;
@@ -307,9 +332,15 @@ namespace VaccineSlotter
                 TimeSpan tempTS = endTime - messageTime;
                 if (tempTS.Seconds / 60 > 3) // 3 Min
                 {
-                    Console.WriteLine("Vaccine-Spotter is Running to check Available Slot");
+                    Console.WriteLine("\n -----------------Vaccine-Spotter is Running to check Available Slot. -------------\n");
                     messageTime = DateTime.Now;
                 }
+            } // While Loop
+
+            if (statusCode != HttpStatusCode.OK)
+            {
+                Console.WriteLine(statusCode.ToString());
+                string tempResponseString = Console.ReadLine();
             }
         }
 
