@@ -143,14 +143,15 @@ namespace VaccineSlotter
         static string  DisplayCenterData(ref CenterData data)
         {
             string result = "\n";
+            string endLineCharInMail = " <br />";
 
-            result += "------------------------------------------------------\n";
+            result += "------------------------------------------------------" + endLineCharInMail;
             Console.WriteLine("==============================================\n");
 
-            result += "\nName: \t" + data.Name;
+            result += endLineCharInMail + "Name: \t" + data.Name;
             Console.WriteLine("\nName: \t" + data.Name);
 
-            result += "\nPinCode: \t" + data.PinCode +"\n";
+            result += endLineCharInMail + "PinCode: \t" + data.PinCode +"\n";
             Console.WriteLine("\nPinCode \t" + data.PinCode);
 
             List<SessonData> pSessionData = data.SessonsDataArray;
@@ -161,10 +162,10 @@ namespace VaccineSlotter
                 int minAgeInData = pObj.Min_age_limit;
                 int slotAvailable = pObj.Available_Capacity;
 
-                result += "\nMin Age Limit \t" + minAgeInData.ToString() + "\n";
+                result += endLineCharInMail + "Min Age Limit \t" + minAgeInData.ToString() + endLineCharInMail;
                 Console.WriteLine("\nMin Age Limit: \t" + minAgeInData.ToString());
 
-                result += "Slot Available \t" + slotAvailable.ToString() + "\n";
+                result += "Slot Available: \t" + slotAvailable.ToString() + endLineCharInMail;
                 Console.WriteLine("\nSlot Available: \t" + slotAvailable.ToString());
 
             }
@@ -176,7 +177,7 @@ namespace VaccineSlotter
 
         //=======================================================================
 
-        static HttpStatusCode ReadDataByDistrictName(int minAge, int distCode, ref string emailId)
+        static HttpStatusCode ReadDataByDistrictName(int minAge, int distCode, ref string emailId, ref string mailBody)
         {
             DateTime date = DateTime.Now;
             // converting to string format
@@ -225,7 +226,7 @@ namespace VaccineSlotter
 
                 if (shortedData.Count > 0)
                 {
-                    string mailBody = "";
+                    string mailBodyToSend = "";
                     for (int count = 0; count < shortedData.Count; ++count)
                     {
                         Console.Beep();
@@ -233,11 +234,17 @@ namespace VaccineSlotter
 
                         CenterData pData = shortedData[count];
                         string result = DisplayCenterData(ref pData);
-                        mailBody += result;
+                        mailBodyToSend += result;
 
                     }// Vaild data
 
-                    Email(ref mailBody, ref emailId);
+                    // Send mail if found different info
+                    if (string.Equals(mailBodyToSend, mailBody) == false)
+                    {
+                        mailBody = mailBodyToSend;
+                        Email(ref mailBody, ref emailId);
+                    }
+
                 }// checker
 
             }
@@ -313,6 +320,8 @@ namespace VaccineSlotter
 
             DateTime messageTime = DateTime.Now;
             HttpStatusCode statusCode = HttpStatusCode.NotImplemented;
+            string mailBodySendOnEmail = "";
+
             while(true)
             {                
                 if (sec >= 3) // 3 Sec
@@ -320,9 +329,16 @@ namespace VaccineSlotter
                     startTime = DateTime.Now;
                     endTime = DateTime.Now;
 
-                    statusCode = ReadDataByDistrictName(age, distCode, ref emailID);
+                    string mailBodyOfSendBefore = mailBodySendOnEmail;
+                    statusCode = ReadDataByDistrictName(age, distCode, ref emailID, ref mailBodySendOnEmail);
+
                     if (statusCode != HttpStatusCode.OK)
                         break;
+
+                    // Check mail have same string or not
+                    if (string.Equals(mailBodyOfSendBefore, mailBodySendOnEmail) == false)
+                    {
+                    }
                 }                
 
                 endTime = DateTime.Now;
