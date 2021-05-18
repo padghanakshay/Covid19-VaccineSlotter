@@ -1,18 +1,23 @@
 # VaccineSlotter
 ## <a name="use">How to Use</a>
 <details>
-  <summary> Download VaccineSlotter.exe from Release </summary>
-</details>
-<details>
+  <summary> By using Software --> Download VaccineSlotter.exe from Release </summary>
+  
+  <details>
   <summary> Run VaccineSlotter.exe</summary>
-</details>
-<details>
-  <summary> Select Option 1 For manually search</summary>
+  </details>
+  
+  <details>
+    <summary> Select Option 1 For manually search</summary>
 
-  - 1: Give min age to have alert mail. Eg. 18
-  - 2: Enter your mail Id.
-  - 3: Find District code in Below discription of this file and enter in software.
+    - 1: Give min age to have alert mail. Eg. 18
+    - 2: Enter your mail Id.
+    - 3: Find District code in Below discription of this file and enter in software.
+  </details>
+  
 </details>
+
+
 <details>
   <summary> Select Option 2 For search and get alert using Drive data</summary>
 
