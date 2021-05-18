@@ -15,10 +15,7 @@
     - 3: Find District code in Below discription of this file and enter in software.
   </details>
   
-</details>
-
-
-<details>
+  <details>
   <summary> Select Option 2 For search and get alert using Drive data</summary>
 
   - : To add your data in drive text file open following link
@@ -35,11 +32,34 @@
     MinAge: TYPE_MIN_AGE_HERE
     >   
     
-  </details>
-  
+  </details>  
+</details>  
 </details>
 
+<details>
+  <summary> By using Google Drive Link --></summary>
+  
+  <details>
+  <summary> Get alert using Drive data</summary>
 
+  - : To add your data in drive text file open following link
+  - : Link: https://drive.google.com/file/d/1DOTrAk4QtlTVsUg9CE2iQo8Xvao7GVDL/view?usp=sharing
+  - : Open with text editor.
+  - : Add your data in following format
+  
+  <details>
+    <summary> Drive TEXT file format</summary>
+    
+    <
+    Email:	TYPE_YOUR_EMAIL_ID_HERE
+    DistrictCode: TYPE_DISTRICT_CODE_HERE
+    MinAge: TYPE_MIN_AGE_HERE
+    >   
+    
+  </details>  
+  </details>  
+</details>
+    
 DISTRICT CODE
 ## <a name="district_list">District IDs</a>
 <details>
