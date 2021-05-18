@@ -179,78 +179,83 @@ namespace VaccineSlotter
 
         static HttpStatusCode ReadDataByDistrictName(int minAge, int distCode, ref string emailId, ref string mailBody)
         {
-            DateTime date = DateTime.Now;
-            // converting to string format
-            string date_str = date.ToString("dd-MM-yyyy");
-
-            string URL = "https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByDistrict?district_id=" + distCode.ToString() + 
-                "&date=" + date_str;
-
-            HttpWebResponse response = Program.GET(URL);
-
-            if (response == null)
-                return HttpStatusCode.BadRequest;
-
-            HttpStatusCode statusCode = response.StatusCode;
-            if (statusCode == HttpStatusCode.OK)
+            try
             {
-                //var responseVal = new StreamReader(stream: response.GetResponseStream()).ReadToEnd();
-                ResponseHandler pResponseHandler = new ResponseHandler();
-                string converted = pResponseHandler.ConvertResponseStreamToString(response);
+                DateTime date = DateTime.Now;
+                // converting to string format
+                string date_str = date.ToString("dd-MM-yyyy");
 
-                List<CenterData> centerData = null;
-                ParseStringByDist.GetCentersData(converted, out centerData);
+                string URL = "https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByDistrict?district_id=" + distCode.ToString() +
+                    "&date=" + date_str;
 
-                List<CenterData> shortedData = new List<CenterData>();
+                HttpWebResponse response = Program.GET(URL);
 
-                for (int count = 0; count < centerData.Count; ++count )
+                if (response == null)
+                    return HttpStatusCode.BadRequest;
+
+                HttpStatusCode statusCode = response.StatusCode;
+                if (statusCode == HttpStatusCode.OK)
                 {
-                    CenterData pData = centerData[count];
-                    List<SessonData> pSessionData = pData.SessonsDataArray;
+                    //var responseVal = new StreamReader(stream: response.GetResponseStream()).ReadToEnd();
+                    ResponseHandler pResponseHandler = new ResponseHandler();
+                    string converted = pResponseHandler.ConvertResponseStreamToString(response);
 
-                    for (int sCount = 0; pSessionData != null && sCount < pSessionData.Count; ++sCount)
+                    List<CenterData> centerData = null;
+                    ParseStringByDist.GetCentersData(converted, out centerData);
+
+                    List<CenterData> shortedData = new List<CenterData>();
+
+                    for (int count = 0; count < centerData.Count; ++count)
                     {
-                        SessonData pSessonDataInArray = pSessionData[sCount];
-                        int minAgeInData = pSessonDataInArray.Min_age_limit;
-                        int slotAvailable = pSessonDataInArray.Available_Capacity;
+                        CenterData pData = centerData[count];
+                        List<SessonData> pSessionData = pData.SessonsDataArray;
 
-                        if (minAgeInData == minAge)
+                        for (int sCount = 0; pSessionData != null && sCount < pSessionData.Count; ++sCount)
                         {
-                            if (slotAvailable > 0)
+                            SessonData pSessonDataInArray = pSessionData[sCount];
+                            int minAgeInData = pSessonDataInArray.Min_age_limit;
+                            int slotAvailable = pSessonDataInArray.Available_Capacity;
+
+                            if (minAgeInData == minAge)
                             {
-                                shortedData.Add(pData);
+                                if (slotAvailable > 0)
+                                {
+                                    shortedData.Add(pData);
+                                }
                             }
                         }
-                    }
-                }// Data 
+                    }// Data 
 
-                if (shortedData.Count > 0)
-                {
-                    string mailBodyToSend = "";
-                    for (int count = 0; count < shortedData.Count; ++count)
+                    if (shortedData.Count > 0)
                     {
-                        Console.Beep();
-                        Console.Beep();
+                        string mailBodyToSend = "";
+                        for (int count = 0; count < shortedData.Count; ++count)
+                        {
+                            Console.Beep();
+                            Console.Beep();
 
-                        CenterData pData = shortedData[count];
-                        string result = DisplayCenterData(ref pData);
-                        mailBodyToSend += result;
+                            CenterData pData = shortedData[count];
+                            string result = DisplayCenterData(ref pData);
+                            mailBodyToSend += result;
 
-                    }// Vaild data
+                        }// Vaild data
 
-                    // Send mail if found different info
-                    if (string.Equals(mailBodyToSend, mailBody) == false)
-                    {
-                        mailBody = mailBodyToSend;
-                        Email(ref mailBody, ref emailId);
-                    }
+                        // Send mail if found different info
+                        if (string.Equals(mailBodyToSend, mailBody) == false)
+                        {
+                            mailBody = mailBodyToSend;
+                            Email(ref mailBody, ref emailId);
+                        }
 
-                }// checker
+                    }// checker
 
+                }
+                return statusCode;
             }
-
-
-            return statusCode;
+            catch
+            {
+                return HttpStatusCode.BadRequest;
+            }
         }
 
 
@@ -283,10 +288,163 @@ namespace VaccineSlotter
 
         //======================================================================================
 
-        static void Main(string[] args)
+        static void ReadDownloadedFile(string filename, ref List<DriveTextData> distData)
         {
-            Console.WriteLine("     Welcome!! \n    I can alert you when slot is available. \n\n");
+            try
+            {
+                // Read Text file data
+                StreamReader sr = new StreamReader(filename);
+                string readedLine = sr.ReadLine();
+                string emailData = "Email:";
+                string districtData = "DistrictCode:";
+                string minAgeData = "MinAge:";
+                string startData = "<";
+                string endData = ">";
 
+                DriveTextData tempData = null;
+
+                while (readedLine != null)
+                {
+                    int indexEmail = readedLine.IndexOf(emailData);
+                    int indexStart = readedLine.IndexOf(startData);
+                    int indexEnd = readedLine.IndexOf(endData);
+                    int indexMinEdge = readedLine.IndexOf(minAgeData);
+                    int indexDistCode = readedLine.IndexOf(districtData);
+                    if (indexStart >= 0)
+                    {
+                        string startString = readedLine.Substring(indexStart + startData.Length);
+                        startString = startString.Trim();
+
+                        if (startString.Length == 0)
+                            tempData = new DriveTextData();
+                    }
+
+                    if (indexEnd >= 0)
+                    {
+                        string endString = readedLine.Substring(indexEnd + endData.Length);
+                        endString = endString.Trim();
+
+                        if (endString.Length == 0)
+                        {
+                            distData.Add(tempData);
+                            tempData = null;
+                        }
+                    }
+
+                    if (indexEmail >= 0)
+                    {
+                        string emailId = readedLine.Substring(indexEmail + emailData.Length);
+                        emailId = emailId.Trim();
+                        tempData.EmailID = emailId;
+                    }
+                    else if (indexMinEdge >= 0)
+                    {
+                        string age = readedLine.Substring(indexMinEdge + minAgeData.Length);
+                        age = age.Trim();
+                        bool tempBool = age.Contains(".");
+                        if (tempBool == false)
+                            tempData.MinAge = int.Parse(age);
+                    }
+                    else if (indexDistCode >= 0)
+                    {
+                        string dist = readedLine.Substring(indexDistCode + districtData.Length);
+                        dist = dist.Trim();
+
+                        bool tempBool = dist.Contains(".");
+                        if (tempBool == false)
+                            tempData.DistCode = int.Parse(dist);
+                    }
+
+                    //Read the next line
+                    readedLine = sr.ReadLine();
+                }
+                //close the file
+                sr.Close();
+            }
+            catch
+            {
+
+            }
+        }
+
+        //======================================================================================
+
+        static void FindVaccineByDriveLink()
+        {
+            // Download drive file
+            string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "text.txt");
+            string tempPath = System.IO.Path.GetTempPath();
+            path = tempPath + "DownloadedFile.txt";
+            FileDownloader fileDownloader = new FileDownloader();
+            fileDownloader.DownloadFile("https://drive.google.com/uc?id=1DOTrAk4QtlTVsUg9CE2iQo8Xvao7GVDL&export=download", path);
+
+            DateTime messageTime = DateTime.Now;
+            HttpStatusCode statusCode = HttpStatusCode.NotImplemented;
+           
+            DateTime startTime = DateTime.Now;
+            DateTime endTime = DateTime.Now;
+            TimeSpan ts = endTime - startTime;
+            int sec = 3;
+
+            List<DriveTextData> driveData = new List<DriveTextData>();                       
+            ReadDownloadedFile(path, ref driveData);
+            List<string> mailBodySendOnEmail = new List<string>();
+            for (int countD = 0; countD < driveData.Count; ++countD)
+                mailBodySendOnEmail.Add("");
+
+            Console.WriteLine("\n------------------Vaccine-Spotter is Running--------------------------\n");
+
+            while (true)
+            {
+                if (sec >= 3) // 3 Sec
+                {
+                    startTime = DateTime.Now;
+                    endTime = DateTime.Now;
+
+                    for (int countD = 0; countD < driveData.Count; ++countD )
+                    {
+                        DriveTextData pDriveData = driveData[countD];
+                        string mailSended = mailBodySendOnEmail[countD];
+                        string emailId = pDriveData.EmailID;
+
+                        statusCode = ReadDataByDistrictName(pDriveData.MinAge, pDriveData.DistCode,
+                            ref emailId, ref mailSended);
+
+                        mailBodySendOnEmail[countD] = mailSended;
+                        if (statusCode != HttpStatusCode.OK)
+                            break;
+                    }// User Loop
+
+                    if (statusCode != HttpStatusCode.OK)
+                        break;
+                }
+
+                endTime = DateTime.Now;
+                ts = endTime - startTime;
+                sec = ts.Seconds;
+
+                TimeSpan tempTS = endTime - messageTime;
+                if (tempTS.Minutes == 5) // 5 Min-- Download data And update users
+                {
+                    Console.WriteLine("\n------------------Vaccine-Spotter is Running--------------------------\n");
+
+                    mailBodySendOnEmail.Clear();
+                    driveData.Clear();
+
+                    ReadDownloadedFile(path, ref driveData);
+                    
+                    for (int countD = 0; countD < driveData.Count; ++countD)
+                        mailBodySendOnEmail.Add("");
+
+                    messageTime = DateTime.Now;
+                }
+            } // While Loop
+        }
+
+        //======================================================================================
+
+        static void FindVaccineByUserPreferance()
+        {
             Console.WriteLine("Enter min age to set an alert");
             string ageString = Console.ReadLine();
             if (ageString == null || ageString.Length == 0)
@@ -322,31 +480,24 @@ namespace VaccineSlotter
             HttpStatusCode statusCode = HttpStatusCode.NotImplemented;
             string mailBodySendOnEmail = "";
 
-            while(true)
-            {                
+            while (true)
+            {
                 if (sec >= 3) // 3 Sec
                 {
                     startTime = DateTime.Now;
                     endTime = DateTime.Now;
-
-                    string mailBodyOfSendBefore = mailBodySendOnEmail;
                     statusCode = ReadDataByDistrictName(age, distCode, ref emailID, ref mailBodySendOnEmail);
 
                     if (statusCode != HttpStatusCode.OK)
                         break;
-
-                    // Check mail have same string or not
-                    if (string.Equals(mailBodyOfSendBefore, mailBodySendOnEmail) == false)
-                    {
-                    }
-                }                
+                }
 
                 endTime = DateTime.Now;
                 ts = endTime - startTime;
                 sec = ts.Seconds;
 
                 TimeSpan tempTS = endTime - messageTime;
-                if (tempTS.Seconds / 60 > 3) // 3 Min
+                if (tempTS.Minutes == 3) // 3 Min
                 {
                     Console.WriteLine("\n -----------------Vaccine-Spotter is Running to check Available Slot. -------------\n");
                     messageTime = DateTime.Now;
@@ -358,6 +509,28 @@ namespace VaccineSlotter
                 Console.WriteLine(statusCode.ToString());
                 string tempResponseString = Console.ReadLine();
             }
+        }
+
+        //======================================================================================
+
+        static void Main(string[] args)
+        {
+
+            Console.WriteLine("     Welcome!! \n    I can alert you when slot is available. \n\n");
+            Console.WriteLine("     Opetion 1. Search vaccine Manually \n");
+            Console.WriteLine("     Opetion 2. Search vaccine Using Drive Link \n");
+            int opetion = int.Parse(Console.ReadLine());
+            Console.WriteLine("\n");
+            if (opetion == 1)
+            {
+                FindVaccineByUserPreferance();
+            }
+            else if (opetion == 2)
+            {
+                FindVaccineByDriveLink();
+            }
+
+            
         }
 
         //======================================================================================
