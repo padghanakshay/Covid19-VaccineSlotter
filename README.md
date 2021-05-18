@@ -7,14 +7,14 @@
   <summary> Run VaccineSlotter.exe</summary>
 </details>
 <details>
-  <summary> Select Opetion 1 For manually search</summary>
+  <summary> Select Option 1 For manually search</summary>
 
   - 1: Give min age to have alert mail. Eg. 18
   - 2: Enter your mail Id.
   - 3: Find District code in Below discription of this file and enter in software.
 </details>
 <details>
-  <summary> Select Opetion 2 For search and get alert using Drive data</summary>
+  <summary> Select Option 2 For search and get alert using Drive data</summary>
 
   - : To add your data in drive text file open following link
   - : Link: https://drive.google.com/file/d/1DOTrAk4QtlTVsUg9CE2iQo8Xvao7GVDL/view?usp=sharing
