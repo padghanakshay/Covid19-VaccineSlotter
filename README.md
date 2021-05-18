@@ -14,7 +14,7 @@
   - 3: Find District code in Below discription of this file and enter in software.
 </details>
 <details>
-  <summary> Select Opetion 2 For searcha nd get alert using Drive data</summary>
+  <summary> Select Opetion 2 For search and get alert using Drive data</summary>
 
   - : To add your data in drive text file open following link
   - : Link: https://drive.google.com/file/d/1DOTrAk4QtlTVsUg9CE2iQo8Xvao7GVDL/view?usp=sharing
@@ -24,11 +24,11 @@
   <details>
     <summary> Drive TEXT file format</summary>
     
-    - : <
-    - : Email:	TYPE_YOUR_EMAIL_ID_HERE
-    - : DistrictCode: TYPE_DISTRICT_CODE_HERE
-    - : MinAge: TYPE_MIN_AGE_HERE
-    - : >   
+    <
+    Email:	TYPE_YOUR_EMAIL_ID_HERE
+    DistrictCode: TYPE_DISTRICT_CODE_HERE
+    MinAge: TYPE_MIN_AGE_HERE
+    >   
     
   </details>
   
