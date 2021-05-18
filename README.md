@@ -1,9 +1,21 @@
 # VaccineSlotter
+## <a name="use">How to Use</a>
+<details>
+  <summary> Download VaccineSlotter.exe from Release </summary>
+</details>
+<details>
+  <summary> Run VaccineSlotter.exe</summary>
+</details>
+<details>
+  <summary> Select Opetion 1 For manually search</summary>
+
+  - 3: Find District code in Below discription of this file and enter in software.
+  - 1: Give min age to have alert mail. Eg. 18
+  - 2: Enter your mail Id.
+</details>
+
 DISTRICT CODE
-
-
 ## <a name="district_list">District IDs</a>
-
 <details>
   <summary> Andaman & Nicobar Islands </summary>
 
