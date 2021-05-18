@@ -19,7 +19,7 @@
   - : To add your data in drive text file open following link
   - : Link: https://drive.google.com/file/d/1DOTrAk4QtlTVsUg9CE2iQo8Xvao7GVDL/view?usp=sharing
   - : Open with text editor.
-  - : Add four data in following format
+  - : Add your data in following format
   
   <details>
     <summary> Drive TEXT file format</summary>
