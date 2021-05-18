@@ -1,5 +1,5 @@
 # VaccineSlotter
-dISTRICT CODE
+DISTRICT CODE
 
 
 ## <a name="district_list">District IDs</a>
