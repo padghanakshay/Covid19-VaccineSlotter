@@ -369,7 +369,7 @@ namespace VaccineSlotter
 
         //======================================================================================
 
-        static void FindVaccineByDriveLink()
+        static void DownloadFileAndReadData(ref List<DriveTextData> driveData)
         {
             // Download drive file
             string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "text.txt");
@@ -377,6 +377,17 @@ namespace VaccineSlotter
             path = tempPath + "DownloadedFile.txt";
             FileDownloader fileDownloader = new FileDownloader();
             fileDownloader.DownloadFile("https://drive.google.com/uc?id=1DOTrAk4QtlTVsUg9CE2iQo8Xvao7GVDL&export=download", path);
+
+            ReadDownloadedFile(path, ref driveData);
+        }
+
+        //======================================================================================
+        
+        static void FindVaccineByDriveLink()
+        {
+            // Download and read drive file
+            List<DriveTextData> driveData = new List<DriveTextData>();
+            DownloadFileAndReadData(ref driveData);
 
             DateTime messageTime = DateTime.Now;
             HttpStatusCode statusCode = HttpStatusCode.NotImplemented;
@@ -386,8 +397,7 @@ namespace VaccineSlotter
             TimeSpan ts = endTime - startTime;
             int sec = 3;
 
-            List<DriveTextData> driveData = new List<DriveTextData>();                       
-            ReadDownloadedFile(path, ref driveData);
+            // Make mail body same as email we got
             List<string> mailBodySendOnEmail = new List<string>();
             for (int countD = 0; countD < driveData.Count; ++countD)
                 mailBodySendOnEmail.Add("");
@@ -398,9 +408,6 @@ namespace VaccineSlotter
             {
                 if (sec >= 3) // 3 Sec
                 {
-                    startTime = DateTime.Now;
-                    endTime = DateTime.Now;
-
                     for (int countD = 0; countD < driveData.Count; ++countD )
                     {
                         DriveTextData pDriveData = driveData[countD];
@@ -413,10 +420,15 @@ namespace VaccineSlotter
                         mailBodySendOnEmail[countD] = mailSended;
                         if (statusCode != HttpStatusCode.OK)
                             break;
-                    }// User Loop
+                    }// User Loop                    
 
                     if (statusCode != HttpStatusCode.OK)
-                        break;
+                    {
+                        continue; // Sometime network is week so avoid it for now. and try again immediately
+                    }
+
+                    startTime = DateTime.Now;
+                    endTime = DateTime.Now;
                 }
 
                 endTime = DateTime.Now;
@@ -431,8 +443,10 @@ namespace VaccineSlotter
                     mailBodySendOnEmail.Clear();
                     driveData.Clear();
 
-                    ReadDownloadedFile(path, ref driveData);
-                    
+                    // Download and read data
+                    DownloadFileAndReadData(ref driveData);
+
+                    // Make mail body same as email we got
                     for (int countD = 0; countD < driveData.Count; ++countD)
                         mailBodySendOnEmail.Add("");
 
