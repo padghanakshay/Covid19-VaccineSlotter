@@ -276,7 +276,7 @@ namespace VaccineSlotter
                 smtp.Host = "smtp.gmail.com"; //for gmail host  
                 smtp.EnableSsl = true;
                 smtp.UseDefaultCredentials = false;
-                smtp.Credentials = new NetworkCredential("akshaypadghan567@gmail.com", "A8379820735@a");
+                smtp.Credentials = new NetworkCredential("akshaypadghan567@gmail.com", "PASSWORD");
                 smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
                 smtp.Send(message);
             }
@@ -517,8 +517,8 @@ namespace VaccineSlotter
         {
 
             Console.WriteLine("     Welcome!! \n    I can alert you when slot is available. \n\n");
-            Console.WriteLine("     Opetion 1. Search vaccine Manually \n");
-            Console.WriteLine("     Opetion 2. Search vaccine Using Drive Link \n");
+            Console.WriteLine("     Option 1. Search vaccine Manually \n");
+            Console.WriteLine("     Option 2. Search vaccine Using Drive Link \n");
             int opetion = int.Parse(Console.ReadLine());
             Console.WriteLine("\n");
             if (opetion == 1)
